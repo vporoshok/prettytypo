@@ -1,0 +1,4 @@
+prettytypo
+==========
+
+Typographer for LaTeX
