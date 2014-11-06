@@ -28,13 +28,13 @@ class Machine(object):
         self.log.info('append \'%s\' state')
         self._stack.append(self._states[state_name](self))
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, chunk):
         if not self._stack:
             self.log.error('stack is empty')
 
             raise LookupError('Machine stack is empty')
 
-        return self._stack[-1].call(*args, **kwargs)
+        return self._stack[-1].call(chunk)
 
     def pop(self):
         if not self._stack:
@@ -80,8 +80,8 @@ class StateMixin(object):
 
         return self._result
 
-    def call(self, char):
-        self._result += char
+    def call(self, chunk):
+        self._result += chunk
 
     def back(self, state):
         self._result += state.result
