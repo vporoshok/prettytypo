@@ -4,6 +4,15 @@
 from logging import getLogger
 
 
+class ClassProperty(object):
+    def __init__(self, function):
+        self.function = function
+
+    def __get__(self, _, owner):
+
+        return self.function(owner)
+
+
 class Machine(object):
     def __init__(self):
         self.log = getLogger('StateMachine')
@@ -34,10 +43,10 @@ class Machine(object):
 
             raise LookupError('Machine stack is empty')
 
-        return self._stack[-1].call(chunk)
+        return self.current.call(chunk)
 
     def pop(self):
-        if not self._stack:
+        if not len(self):
             self.log.warning('stack is empty')
 
             return None
@@ -47,9 +56,22 @@ class Machine(object):
         self.log.info('state \'%s\' has finished', last_state.name)
         self.log.info('result: \'\'\'%s\'\'\'', last_state.result)
 
-        self._stack[-1].back(last_state)
+        if self.current is not None:
+            self.current.back(last_state)
 
         return last_state.result
+
+    def __len__(self):
+
+        return len(self._stack)
+
+    @property
+    def current(self):
+        if not len(self):
+
+            return None
+
+        return self._stack[-1]
 
 
 class StateMixin(object):
@@ -70,7 +92,7 @@ class StateMixin(object):
 
             raise TypeError('State container must have \'__add__\' method')
 
-    @property
+    @ClassProperty
     def name(self):
 
         return self._name
@@ -82,6 +104,8 @@ class StateMixin(object):
 
     def call(self, chunk):
         self._result += chunk
+
+        return None
 
     def back(self, state):
         self._result += state.result
