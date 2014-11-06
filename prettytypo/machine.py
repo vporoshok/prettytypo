@@ -5,9 +5,8 @@ from logging import getLogger
 
 
 class Machine(object):
-    log = getLogger('StateMachine')
-
     def __init__(self):
+        self.log = getLogger('StateMachine')
         self._stack = []
         self._states = {
             'default': StateMixin
@@ -54,15 +53,27 @@ class Machine(object):
 
 
 class StateMixin(object):
-    name = 'default'
+    _name = 'default'
+    _container = list
 
     def __init__(self, machine):
+        self.log = getLogger('StateMachine.{0}'.format(self._name))
         if not isinstance(machine, Machine):
 
             raise TypeError('{0} is not Machine'.format(machine))
 
         self.machine = machine
-        self._result = ''
+        self._result = self._container()
+        if not hasattr(self._result, '__add__'):
+            self.log.error('\'%s\' hasn\'t \'__add__\' method',
+                           self._container)
+
+            raise TypeError('State container must have \'__add__\' method')
+
+    @property
+    def name(self):
+
+        return self._name
 
     @property
     def result(self):
