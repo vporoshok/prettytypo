@@ -13,9 +13,9 @@ class ClassProperty(object):
         return self.function(owner)
 
 
-class Machine(object):
+class StateStack(object):
     def __init__(self):
-        self.log = getLogger('StateMachine')
+        self.log = getLogger('StateStack')
         self._stack = []
         self._states = {
             'default': StateMixin
@@ -41,7 +41,7 @@ class Machine(object):
         if not self._stack:
             self.log.error('stack is empty')
 
-            raise LookupError('Machine stack is empty')
+            raise LookupError('Stack stack is empty')
 
         return self.current.call(chunk)
 
@@ -78,19 +78,19 @@ class StateMixin(object):
     _name = 'default'
     _container = list
 
-    def __init__(self, machine):
-        self.log = getLogger('StateMachine.{0}'.format(self._name))
-        if not isinstance(machine, Machine):
+    def __init__(self, stack):
+        self.log = getLogger('StateStack.{0}'.format(self._name))
+        if not isinstance(stack, StateStack):
 
-            raise TypeError('{0} is not Machine'.format(machine))
+            raise TypeError('{0} is not StateStack'.format(stack))
 
-        self.machine = machine
+        self.stack = stack
         self._result = self._container()
-        if not hasattr(self._result, '__add__'):
-            self.log.error('\'%s\' hasn\'t \'__add__\' method',
+        if not hasattr(self._result, '__len__'):
+            self.log.error('\'%s\' hasn\'t \'__len__\' method',
                            self._container)
 
-            raise TypeError('State container must have \'__add__\' method')
+            raise TypeError('State container must have \'__len__\' method')
 
     @ClassProperty
     def name(self):
@@ -103,6 +103,13 @@ class StateMixin(object):
         return self._result
 
     def call(self, chunk):
+        if not isinstance(chunk, self._container):
+            self.log.error('chunk \'%s\' is not a instance of \'%s\'',
+                           chunk, self._container)
+
+            raise TypeError('Chunk must be instance of \'{0}\''
+                            .format(self._container))
+
         self._result += chunk
 
         return None
