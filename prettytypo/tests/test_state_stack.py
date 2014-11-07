@@ -3,7 +3,7 @@
 
 from unittest import TestCase
 
-from prettytypo.state_stack import StateStack, StateMixin
+from prettytypo.state_stack import StateStack, StateDefault
 
 
 class TestMachine(TestCase):
@@ -14,7 +14,7 @@ class TestMachine(TestCase):
         self.assertEqual(len(stack), 0)
 
     def test_register(self):
-        class TestState(StateMixin):
+        class TestState(StateDefault):
             _name = 'test'
 
         stack = StateStack()
@@ -66,21 +66,21 @@ class TestMachine(TestCase):
         self.assertIsNone(stack.current)
 
 
-class TestStateMixin(TestCase):
+class TestStateDefault(TestCase):
     def test_init(self):
         stack = StateStack()
-        state = StateMixin(stack)
+        state = StateDefault(stack)
 
-        self.assertIsInstance(state, StateMixin)
+        self.assertIsInstance(state, StateDefault)
         self.assertEqual(state.name, 'default')
         self.assertListEqual(state.result, [])
 
     def test_init_fail(self):
         with self.assertRaises(TypeError):
-            StateMixin(0)
+            StateDefault(0)
 
     def test_bad_container(self):
-        class BadState(StateMixin):
+        class BadState(StateDefault):
             _name = 'bad'
             _container = int
 
@@ -90,21 +90,21 @@ class TestStateMixin(TestCase):
 
     def test_exec(self):
         stack = StateStack()
-        state = StateMixin(stack)
+        state = StateDefault(stack)
         state.call([0])
 
         self.assertListEqual(state.result, [0])
 
     def test_exec_fail(self):
         stack = StateStack()
-        state = StateMixin(stack)
+        state = StateDefault(stack)
         with self.assertRaises(TypeError):
             state.call(0)
 
     def test_back(self):
         stack = StateStack()
-        state1 = StateMixin(stack)
-        state2 = StateMixin(stack)
+        state1 = StateDefault(stack)
+        state2 = StateDefault(stack)
         state2.call([0])
         state1.back(state2)
 

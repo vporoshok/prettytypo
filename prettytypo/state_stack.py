@@ -18,11 +18,11 @@ class StateStack(object):
         self.log = getLogger('StateStack')
         self._stack = []
         self._states = {
-            'default': StateMixin
+            'default': StateDefault
         }
 
     def register(self, state_class):
-        if not issubclass(state_class, StateMixin):
+        if not issubclass(state_class, StateDefault):
 
             raise TypeError('{0} is not State'.format(state_class))
 
@@ -74,7 +74,7 @@ class StateStack(object):
         return self._stack[-1]
 
 
-class StateMixin(object):
+class StateDefault(object):
     _name = 'default'
     _container = list
 

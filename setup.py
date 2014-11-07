@@ -11,8 +11,8 @@ ENTRY_POINTS = {
     ]
 }
 
-README = open('README.md').read()
-CHANGELOG = open('docs/changelog.md').read()
+README = open('README.rst').read()
+CHANGELOG = open('docs/changelog.rst').read()
 REQUIREMENTS = [req for req in parse_requirements('requirements.txt')]
 
 
