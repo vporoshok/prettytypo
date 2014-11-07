@@ -3,24 +3,31 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to prettytypo's documentation!
+Добро пожаловать в документацию prettytypo!
 ======================================
 
-Typographer for LaTeX
+Типограф для LaTeX
 
-Contents:
+:License: MIT
+:Requirements: Python 2.7, 3.2+
+:Version: 0.0.1
+
+Содержание:
 
 .. toctree::
    :maxdepth: 2
 
    why
    rules
-   changelog
-   api/modules
+   История изменений <changelog>
 
-:License: MIT
-:Requirements: Python 2.7, 3.2+
-:Version: 0.0.1
+
+Индексы и таблицы
+=================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 
 .. |build-status| image:: https://travis-ci.org/vporoshok/prettytypo.svg?branch=master
    :target: https://travis-ci.org/vporoshok/prettytypo
@@ -31,12 +38,3 @@ Contents:
 .. |docs| image:: https://readthedocs.org/projects/prettytypo/badge/?version=latest
    :target: http://prettytypo.readthedocs.org/
    :alt: Documentation
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-

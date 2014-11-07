@@ -19,7 +19,7 @@ REQUIREMENTS = [req for req in parse_requirements('requirements.txt')]
 setup(
     name="prettytypo",
     version="0.0.1",
-    url='',
+    url='http://prettytypo.readthedocs.org',
     author='Evgeniy Bastrykov',
     author_email='vporoshok@gmail.com',
     description=README,
