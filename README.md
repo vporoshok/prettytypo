@@ -6,6 +6,6 @@ prettytypo
 
 * License: MIT
 * Requirements: Python 2.7, 3.2+
-* Version: 0.0.1
+* Version: 0.0.0
 
 Typographer for LaTeX
