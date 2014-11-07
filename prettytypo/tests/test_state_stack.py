@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# pylint: disable=missing-docstring
 
 from unittest import TestCase
 
-from prettytypo.state_stack import StateDefault, States, StateStack
+from prettytypo.state_stack import StateDefault, StateSet, StateStack
 
 
 class TestStateDefault(TestCase):
@@ -54,15 +55,15 @@ class TestStateDefault(TestCase):
         StateDefault().end()
 
 
-class TestStates(TestCase):
+class TestStateSet(TestCase):
     def test_init(self):
-        states = States()
+        states = StateSet()
 
-        self.assertIsInstance(states, States)
+        self.assertIsInstance(states, StateSet)
         self.assertEqual(len(states), 1)
 
     def test_getitem(self):
-        states = States()
+        states = StateSet()
 
         self.assertEqual(states['default'], StateDefault)
         self.assertEqual(states['test'], StateDefault)
@@ -70,7 +71,7 @@ class TestStates(TestCase):
     def test_setitem(self):
         class TestState(StateDefault):
             real_name = 'test'
-        states = States()
+        states = StateSet()
 
         with self.assertRaises(TypeError):
             states['test'] = int
@@ -126,14 +127,12 @@ class TestMachine(TestCase):
 
     def test_pop(self):
         stack = StateStack()
-        res1 = stack.pop()
+        stack.pop()
         stack.push('state_name')
         stack.push('state_name')
         stack([0])
-        res2 = stack.pop()
+        stack.pop()
 
-        self.assertIsNone(res1)
-        self.assertListEqual(res2, [0])
         self.assertListEqual(stack.current.result, [0])
 
     def test_current(self):
