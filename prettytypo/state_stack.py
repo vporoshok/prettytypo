@@ -10,23 +10,22 @@
 
 '''
 
-from logging import getLogger
+from __future__ import unicode_literals
+
+import logging
 
 
 class StateDefault(object):
     '''Default State
 
-    Use this class as mixin for you own states.
+    Use this class as mixin for your own states.
 
     Parameters:
         name (str, optional): init_name, default is None and will copied
             from real_name
         stack (:class:`.StateStack`, optional): stack that construct this
             instance, default is None and will created new StateStack
-
-    Raises:
-        TypeError: if container is not a collection or stack
-            is not a :class:`.StateStack`
+        key (any): :attr:`.key`
 
     Attributes:
         real_name (str): name with what it will be registered
@@ -37,17 +36,19 @@ class StateDefault(object):
         followers (list of str): list of eventual next states (by name)
 
         stack (:class:`.StateStack`): stack that construct this instance
+
+        key (any): something you want to store
         result (:attr:`.container`): result of all calling
         done (bool): is state done for pop from stack?
 
     '''
 
     real_name = 'default'
-    container = list
     followers = []
+    container = property(lambda _: [])
 
-    def __init__(self, name=None, stack=None):
-        self.log = getLogger('StateStack.{0}'.format(self.real_name))
+    def __init__(self, name=None, stack=None, key=None):
+        self.log = logging.getLogger('StateStack.{0}'.format(self.real_name))
         if name is None:
             name = self.real_name
 
@@ -60,19 +61,24 @@ class StateDefault(object):
 
         self.stack = stack
         self.init_name = name
+        self.key = key
         self.done = False
-        self.result = self.container()
-        if not hasattr(self.result, '__len__'):
-            self.log.error('\'%s\' hasn\'t \'__len__\' method',
-                           self.container)
+        self.result = self.container
 
-            raise TypeError('State container must have \'__len__\' method')
+    def init(self):
+        '''Post initialize
+
+        Redefine this method to initialize your own attributes
+
+        '''
+
+        pass
 
     @classmethod
     def cond(cls, chunk, state):
         '''Condition to push this state
 
-        Redefine this class method to provide auto push this state from other,
+        Redefine this method to provide auto push this state from other,
         that contains this in followers.
 
         Parameters:
@@ -97,11 +103,11 @@ class StateDefault(object):
             chunk (:attr:`.container`): chunk of data
 
         Raises:
-            TypeError: if chunk is not a :attr:`.container` type
+            TypeError: if chunk has another type that container
 
         '''
 
-        if not isinstance(chunk, self.container):
+        if type(chunk) != type(self.container):
             self.log.error('chunk \'%s\' is not a instance of \'%s\'',
                            chunk, self.container)
 
@@ -111,7 +117,7 @@ class StateDefault(object):
         if self.call(chunk):
             self.result += chunk
 
-    def call(self, _):
+    def call(self, chunk):
         '''Main method for state
 
         Redefine this method to modify result.
@@ -123,6 +129,7 @@ class StateDefault(object):
             bool: store this chunk to :attr:`.result`?
 
         '''
+        # pylint: disable=unused-argument
 
         return True
 
@@ -145,6 +152,7 @@ class StateDefault(object):
         to parent state.
 
         '''
+
         pass
 
 
@@ -156,7 +164,7 @@ class StateSet(object):
     '''
 
     def __init__(self):
-        self.log = getLogger('StateStack.States')
+        self.log = logging.getLogger('StateStack.States')
         self._states = {}
         self._states['default'] = StateDefault
 
@@ -211,7 +219,7 @@ class StateStack(object):
     '''
 
     def __init__(self):
-        self.log = getLogger('StateStack')
+        self.log = logging.getLogger('StateStack')
         self._stack = []
         self._states = StateSet()
 
@@ -232,7 +240,7 @@ class StateStack(object):
 
         self._states[state_class.real_name] = state_class
 
-    def push(self, name):
+    def push(self, name, key=None):
         '''Push state in stack
 
         Get the state class by real_name from registered
@@ -242,10 +250,12 @@ class StateStack(object):
 
         Parameters:
             name (str): :attr:`.StateDefault.real_name`
+            name (any): :attr:`.StateDefault.key`
 
         '''
 
-        self._stack.append(self._states[name](name, self))
+        self._stack.append(self._states[name](name, self, key))
+        self.current.init()
 
     def __call__(self, chunk):
         '''Main method of machine
@@ -304,6 +314,8 @@ class StateStack(object):
 
         if self.current is not None:
             self.current.back(last_state)
+
+        return last_state.result
 
     def __len__(self):
         '''Length of stack'''

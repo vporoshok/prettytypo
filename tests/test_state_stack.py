@@ -20,14 +20,6 @@ class TestStateDefault(TestCase):
         with self.assertRaises(TypeError):
             StateDefault(stack=0)
 
-    def test_bad_container(self):
-        class BadState(StateDefault):
-            real_name = 'bad'
-            container = int
-
-        with self.assertRaises(TypeError):
-            BadState()
-
     def test_cond(self):
 
         self.assertFalse(StateDefault.cond(None, None))
